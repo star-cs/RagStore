@@ -1,0 +1,22 @@
+<table name="file" namespace = "rs">
+    <columns>
+        <column name="id" type="int64" desc="唯一主键" auto_increment="true"/>
+        <column name="user" type="string" desc="文件所属用户" size="32"/>
+        <column name="md5" type="string" desc="md5" size="32"/>
+        <column name="file_name" type="string" desc="文件名" size="128"/>
+        <column name="file_size" type="int64" desc="文件大小" size="32"/>
+        <column name="file_url"  type="string" desc="文件url" size="128"/>"
+        <column name="file_type" type="string" desc="文件类型" size="32"/>
+        <column name="create_time" type="timestamp" default="current_timestamp"/>
+        <column name="update_time" type="timestamp" default="current_timestamp" update="current_timestamp"/>
+    </columns>
+    <indexs>
+        <index name="pk" cols="id" type="pk" desc="主键"/>
+        <index name="user" cols="user" type="index" desc="索引"/>
+        <index name="file_name" cols="file_name" type="index" desc="索引"/>
+        <index name="file_type" cols="file_type" type="index" desc="索引"/>
+
+        <index name="md5" cols="md5" type="uniq" desc="唯一索引"/>
+        <index name="file_url" cols="file_url" type="uniq" desc="唯一索引"/>
+    </indexs>
+</table>

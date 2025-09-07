@@ -1,0 +1,13 @@
+<table name="user" namespace = "rs">
+    <columns>
+        <column name="id" type="int64" desc="唯一主键" auto_increment="true"/>
+        <column name="name" type="string" desc="账号"/>
+        <column name="passwd" type="string" desc="密码" length="50"/>
+        <column name="create_time" type="timestamp" default="current_timestamp"/>
+        <column name="update_time" type="timestamp" default="current_timestamp" update="current_timestamp"/>
+    </columns>
+    <indexs>
+        <index name="pk" cols="id" type="pk" desc="主键"/>
+        <index name="name" cols="name" type="uniq" desc="关联"/>
+    </indexs>
+</table>
