@@ -5,6 +5,7 @@ namespace rs
 {
 Message::ptr Message::Create(const std::string &v)
 {
+    std::cout << v << std::endl;
     Json::Value val;
     if (sylar::JsonUtil::FromString(val, v)) {
         return nullptr;

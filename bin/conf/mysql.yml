@@ -2,8 +2,8 @@ mysql:
   dbs:
     rag_store:
         host: 127.0.0.1
-        port: 3306
+        port: 3307
         user: root
-        password: 12345mysql
+        passwd: 12345mysql
         dbname: rag_store
         pool: 5

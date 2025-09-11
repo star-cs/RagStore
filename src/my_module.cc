@@ -14,7 +14,7 @@
 
 namespace rs
 {
-static sylar::Logger::ptr g_logger = SYLAR_LOG_NAME("rs");
+static sylar::Logger::ptr g_logger = SYLAR_LOG_NAME("system");
 
 MyModule::MyModule() : sylar::Module("rag_store", "1.0", "")
 {
@@ -43,7 +43,7 @@ bool MyModule::onServerReady()
 
     for (auto &i : svrs) {
         auto http_server = std::dynamic_pointer_cast<sylar::http::HttpServer>(i);
-        if (!i) {
+        if (!http_server) {
             continue;
         }
 
@@ -52,8 +52,8 @@ bool MyModule::onServerReady()
         UserServlet::ptr user_servlet(new UserServlet);
         FileServlet::ptr file_servlet(new FileServlet);
 
-        slt_dispatch->addServlet("/user/*", user_servlet);
-        slt_dispatch->addServlet("/file/*", file_servlet);
+        slt_dispatch->addGlobServlet("/api/user/*", user_servlet);
+        slt_dispatch->addGlobServlet("/api/file/*", file_servlet);
     }
 
     return true;
@@ -71,13 +71,13 @@ extern "C"
     sylar::Module *CreateModule()
     {
         sylar::Module *module = new rs::MyModule;
-        SYLAR_LOG_INFO(rs::g_logger) << "CreateModule " << module;
+        SYLAR_LOG_INFO(g_logger) << "CreateModule " << module;
         return module;
     }
 
     void DestoryModule(sylar::Module *module)
     {
-        SYLAR_LOG_INFO(rs::g_logger) << "CreateModule " << module;
+        SYLAR_LOG_INFO(g_logger) << "CreateModule " << module;
         delete module;
     }
 }

@@ -8,7 +8,7 @@
 
 namespace rs
 {
-static sylar::Logger::ptr g_logger = SYLAR_LOG_ROOT();
+static sylar::Logger::ptr g_logger = SYLAR_LOG_NAME("system");
 
 UserServlet::UserServlet() : sylar::http::Servlet("user_servlet")
 {
@@ -42,19 +42,22 @@ void UserServlet::login(sylar::http::HttpRequest::ptr request,
                         sylar::http::HttpResponse::ptr response,
                         sylar::http::HttpSession::ptr session)
 {
-    Message::ptr msg = Message::Create(request->getBody());
-    UserInfo::ptr info(new UserInfo);
-    info->setName(msg->get("name"));
-    info->setPasswd(msg->get("passwd"));
+    auto name = request->getParam("name");
+    auto passwd = request->getParam("passwd");
+    if (name.empty() || passwd.empty()) {
+        response->setStatus(sylar::http::HttpStatus::SERVICE_UNAVAILABLE);
+        response->setBody("用户名 | 密码 为空");
+        return;
+    }
 
-    auto m_conn = sylar::MySQLMgr::GetInstance()->get("rag_store");
-    auto user = UserInfoDao::QueryByName(info->getName(), m_conn);
+    auto user = UserInfoDao::QueryByName(name, sylar::MySQLMgr::GetInstance()->get("rag_store"));
     if (!user) {
         response->setStatus(sylar::http::HttpStatus::NOT_FOUND);
         response->setBody("User not found");
         return;
     }
-    if (user->getPasswd() != info->getPasswd()) {
+
+    if (user->getPasswd() != passwd) {
         response->setStatus(sylar::http::HttpStatus::UNAUTHORIZED);
         response->setBody("Password incorrect");
         return;
@@ -63,10 +66,23 @@ void UserServlet::login(sylar::http::HttpRequest::ptr request,
     // 生成 Session
     std::string session_id =
         sylar::random_string(32, "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+    
+    // 要存储的用户信息
+    std::string user_info = user->toJsonString();
 
-    // Session 添加到 Redis
-    auto reply = sylar::RedisUtil::Cmd("rag_store",
-                                       ("SET " + session_id + " " + user->toJsonString()).c_str());
+    // 设置Session过期时间（例如：3600秒 = 1小时）
+    int expire_time = 3600;
+
+    // 执行带过期时间的SET命令 - 使用参数化方式避免JSON字符串中的特殊字符导致的语法错误
+    std::vector<std::string> redis_args;
+    redis_args.push_back("SET");
+    redis_args.push_back(session_id);
+    redis_args.push_back(user_info);
+    redis_args.push_back("EX");
+    redis_args.push_back(std::to_string(expire_time));
+    
+    auto reply = sylar::RedisUtil::Cmd("rag_store", redis_args);
+
     if (!reply) {
         response->setBody("Redis Internal Server Error");
         response->setStatus(sylar::http::HttpStatus::INTERNAL_SERVER_ERROR);
@@ -93,15 +109,30 @@ void UserServlet::registerUser(sylar::http::HttpRequest::ptr request,
                                sylar::http::HttpResponse::ptr response,
                                sylar::http::HttpSession::ptr session)
 {
-    Message::ptr msg = Message::Create(request->getBody());
+    auto name = request->getParam("name");
+    auto passwd = request->getParam("passwd");
+    if (name.empty() || passwd.empty()) {
+        response->setStatus(sylar::http::HttpStatus::SERVICE_UNAVAILABLE);
+        response->setBody("用户名 | 密码 为空");
+        return;
+    }
+
+    UserInfo::ptr info2 =
+        UserInfoDao::QueryByName(name, sylar::MySQLMgr::GetInstance()->get("rag_store"));
+    if (info2 != nullptr) {
+        response->setStatus(sylar::http::HttpStatus::SERVICE_UNAVAILABLE);
+        response->setBody("用户名已存在");
+        return;
+    }
+
     UserInfo::ptr info(new UserInfo);
-    info->setName(msg->get("name"));
-    info->setPasswd(msg->get("passwd"));
+    info->setName(name);
+    info->setPasswd(passwd);
 
     int ret = UserInfoDao::Insert(info, sylar::MySQLMgr::GetInstance()->get("rag_store"));
     if (ret == -1) {
         response->setStatus(sylar::http::HttpStatus::SERVICE_UNAVAILABLE);
-        response->setBody("Registration failed");
+        response->setBody("数据库添加失败");
         return;
     }
     response->setStatus(sylar::http::HttpStatus::OK);
