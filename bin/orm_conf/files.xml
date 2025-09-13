@@ -1,0 +1,22 @@
+<table name="files" namespace="rs">
+    <columns>
+        <column name="id" type="int64" desc="文件ID" auto_increment="true" not_null="true"/>
+        <column name="file_name" type="string" desc="文件名" size="255" not_null="true"/>
+        <column name="file_path" type="string" desc="文件在MinIO中的存储路径" size="1024" not_null="true"/>
+        <column name="minio_object_name" type="string" desc="MinIO对象名称" size="255" not_null="true"/>
+        <column name="minio_bucket" type="string" desc="MinIO存储桶名称" size="100" not_null="true"/>
+        <column name="minio_upload_id" type="string" desc="MinIO分片上传ID" size="255"/>
+        <column name="file_size" type="int64" desc="文件总大小(字节)" not_null="true"/>
+        <column name="file_type" type="string" desc="文件类型(MIME类型)" size="100" not_null="true"/>
+        <column name="md5_hash" type="string" desc="文件MD5哈希值" size="32" not_null="true"/>
+        <column name="status" type="int32" desc="状态(0-上传中,1-已完成,2-已删除)" not_null="true" default="0"/>
+        <column name="created_at" type="timestamp" desc="创建时间" not_null="true" default="current_timestamp"/>
+        <column name="updated_at" type="timestamp" desc="更新时间" not_null="true" default="current_timestamp" update="current_timestamp"/>
+    </columns>
+    <indexs>
+        <index name="pk" cols="id" type="pk" desc="主键"/>
+        <index name="idx_status" cols="status" type="index" desc="状态索引"/>
+        <index name="idx_md5_hash" cols="md5_hash" type="uniq" desc="MD5哈希索引"/>
+        <index name="idx_minio_upload_id" cols="minio_upload_id" type="index" desc="MinIO上传ID索引"/>
+    </indexs>
+</table>

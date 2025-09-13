@@ -1,0 +1,16 @@
+<table name="user_file_relations" namespace="rs">
+    <columns>
+        <column name="id" type="int64" desc="关联ID" auto_increment="true" not_null="true"/>
+        <column name="user_id" type="int64" desc="用户ID" not_null="true"/>
+        <column name="file_id" type="int64" desc="文件ID" not_null="true"/>
+        <column name="permission" type="int32" desc="权限(1-只读,2-读写,3-完全控制)" not_null="true" default="1"/>
+        <column name="created_at" type="timestamp" desc="创建时间" not_null="true" default="current_timestamp"/>
+        <column name="updated_at" type="timestamp" desc="更新时间" not_null="true" default="current_timestamp" update="current_timestamp"/>
+    </columns>
+    <indexs>
+        <index name="pk" cols="id" type="pk" desc="主键"/>
+        <index name="idx_user_id" cols="user_id" type="index" desc="用户ID索引"/>
+        <index name="idx_file_id" cols="file_id" type="index" desc="文件ID索引"/>
+        <index name="uk_user_file" cols="user_id,file_id" type="uniq" desc="用户文件唯一索引"/>
+    </indexs>
+</table>

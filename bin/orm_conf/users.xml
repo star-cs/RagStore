@@ -1,0 +1,18 @@
+<table name="users" namespace="rs">
+    <columns>
+        <column name="id" type="int64" desc="用户ID" auto_increment="true" not_null="true"/>
+        <column name="username" type="string" desc="用户名" size="50" not_null="true"/>
+        <column name="password_hash" type="string" desc="密码哈希" size="255" not_null="true"/>
+        <column name="email" type="string" desc="用户邮箱" size="100" not_null="true"/>
+        <column name="total_storage" type="int64" desc="总存储空间(字节)" not_null="true" default="0"/>
+        <column name="used_storage" type="int64" desc="已使用存储空间(字节)" not_null="true" default="0"/>
+        <column name="status" type="int32" desc="状态(0-禁用,1-正常,2-删除)" not_null="true" default="1"/>
+        <column name="created_at" type="timestamp" desc="创建时间" not_null="true" default="current_timestamp"/>
+        <column name="updated_at" type="timestamp" desc="更新时间" not_null="true" default="current_timestamp" update="current_timestamp"/>
+    </columns>
+    <indexs>
+        <index name="pk" cols="id" type="pk" desc="主键"/>
+        <index name="uk_username" cols="username" type="uniq" desc="用户名唯一索引"/>
+        <index name="uk_email" cols="email" type="uniq" desc="邮箱唯一索引"/>
+    </indexs>
+</table>

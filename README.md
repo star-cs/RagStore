@@ -27,9 +27,26 @@ cmake --version
 
 ```
 
-## Minio 编译
-```bash
+## vcpkg安装minio  
+```
+git clone https://github.com/microsoft/vcpkg.git
+cd vcpkg
+./bootstrap-vcpkg.sh
 
+./vcpkg install minio-cpp
+```
+## docker 部署 minio
+```
+docker run -p 9000:9000 -p 9090:9090 \
+     --net=host \
+     --name minio \
+     -d --restart=always \
+     -e "MINIO_ACCESS_KEY=minioadmin" \
+     -e "MINIO_SECRET_KEY=minioadmin" \
+     -v /home/minio/data:/data \
+     -v /home/minio/config:/root/.minio \
+     minio/minio server \
+     /data --console-address ":9090" -address ":9000"
 ```
 
 ## FAISS 编译

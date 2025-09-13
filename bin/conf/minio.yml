@@ -1,0 +1,9 @@
+minio:
+  config:
+    rag_store:
+      endpoint: 127.0.0.1:9000
+      access_key: minioadmin
+      secret_key: minioadmin
+      use_ssl: false
+      pool: 2
+      timeout: 100

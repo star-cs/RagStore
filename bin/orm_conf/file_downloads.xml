@@ -1,0 +1,22 @@
+<table name="file_downloads" namespace="rs">
+    <columns>
+        <column name="id" type="int64" desc="下载记录ID" auto_increment="true" not_null="true"/>
+        <column name="user_id" type="int64" desc="用户ID" not_null="true"/>
+        <column name="file_id" type="int64" desc="文件ID" not_null="true"/>
+        <column name="chunk_number" type="int32" desc="分片序号" not_null="true"/>
+        <column name="download_start_time" type="timestamp" desc="下载开始时间" not_null="true" default="current_timestamp"/>
+        <column name="download_end_time" type="timestamp" desc="下载结束时间"/>
+        <column name="download_status" type="int32" desc="下载状态(0-进行中,1-完成,2-失败)" not_null="true" default="0"/>
+        <column name="download_size" type="int64" desc="实际下载的分片大小(字节)"/>
+        <column name="ip_address" type="string" desc="下载时的IP地址" size="50"/>
+        <column name="user_agent" type="string" desc="下载时的用户代理信息" size="512"/>
+    </columns>
+    <indexs>
+        <index name="pk" cols="id" type="pk" desc="主键"/>
+        <index name="idx_user_id" cols="user_id" type="index" desc="用户ID索引"/>
+        <index name="idx_file_id" cols="file_id" type="index" desc="文件ID索引"/>
+        <index name="idx_file_chunk" cols="file_id,chunk_number" type="index" desc="文件ID和分片序号索引"/>
+        <index name="idx_download_status" cols="download_status" type="index" desc="下载状态索引"/>
+        <index name="idx_download_start_time" cols="download_start_time" type="index" desc="下载开始时间索引"/>
+    </indexs>
+</table>

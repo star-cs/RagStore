@@ -1,0 +1,26 @@
+version: "3.5"
+services:
+  minio:
+    image: minio/minio
+    container_name: minio
+    privileged: true
+    restart: always
+    ports:
+      # 对外提供的 api 访问端口
+      - 9000:9000
+      # 对外提供的 web 管理后台访问端口
+      - 9001:9001
+    environment:
+      # web管理后台用户名
+      MINIO_ROOT_USER: jobs
+      # web管理后台密码
+      MINIO_ROOT_PASSWORD: jobs@123
+    volumes:
+      # 文件存储目录映射
+      - /apps/minio-erasure/data1:/data1
+      - /apps/minio-erasure/data2:/data2
+      - /apps/minio-erasure/data3:/data3
+      - /apps/minio-erasure/data4:/data4
+    # 运行 minio 服务启动命令，/data 参数是 docker 容器内部的数据目录
+    # 由于 web 管理后台是动态端口，因此必须指定为固定的端口
+    command: server --console-address ":9001" /data{1...4}

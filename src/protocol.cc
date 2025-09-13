@@ -1,11 +1,14 @@
 #include "protocol.h"
+#include "sylar/core/log/log.h"
 #include "sylar/core/util/json_util.h"
 #include "json/value.h"
 namespace rs
 {
+static sylar::Logger::ptr s_logger = sylar::Logger::GetLogger("system");
+
 Message::ptr Message::Create(const std::string &v)
 {
-    std::cout << v << std::endl;
+    SYLAR_LOG_INFO(s_logger) << v;
     Json::Value val;
     if (sylar::JsonUtil::FromString(val, v)) {
         return nullptr;

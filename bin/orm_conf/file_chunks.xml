@@ -1,0 +1,21 @@
+<table name="file_chunks" namespace="rs">
+    <columns>
+        <column name="id" type="int64" desc="分片ID" auto_increment="true" not_null="true"/>
+        <column name="user_id" type="int64" desc="用户ID" not_null="true"/>
+        <column name="file_id" type="int64" desc="所属文件ID" not_null="true"/>
+        <column name="chunk_number" type="int32" desc="分片序号(从1开始)" not_null="true"/>
+        <column name="chunk_size" type="int32" desc="当前分片大小(字节)" not_null="true"/>
+        <column name="chunk_hash" type="string" desc="分片MD5哈希值" size="32" not_null="true"/>
+        <column name="minio_part_number" type="int32" desc="MinIO分片编号" not_null="true"/>
+        <column name="minio_etag" type="string" desc="MinIO返回的ETag" size="100"/>
+        <column name="status" type="int32" desc="状态(0-未上传,1-已上传,2-校验失败,3-已删除)" not_null="true" default="0"/>
+        <column name="uploaded_at" type="timestamp" desc="上传时间"/>
+    </columns>
+    <indexs>
+        <index name="pk" cols="id" type="pk" desc="主键"/>
+        <index name="idx_user_id" cols="user_id" type="index" desc="用户ID索引"/>
+        <index name="idx_file_id" cols="file_id" type="index" desc="文件ID索引"/>
+        <index name="uk_file_chunk" cols="file_id,chunk_number" type="uniq" desc="文件ID和分片序号唯一索引"/>
+        <index name="idx_status" cols="status" type="index" desc="状态索引"/>
+    </indexs>
+</table>
